@@ -57,6 +57,7 @@
       (do (.set *courier-available* 1)
       (println "Now you can use a courier"))
     (swap! finished game-is-finished?)))
+)
 
 (defn set-health-value [target value]
   "Set players health value.
@@ -119,9 +120,9 @@
      0 (print "You can't use courier cause you don't have enough points" eol)
      1 (if (@existing-items (keyword item))
          (do
-           (alter (:items @player/*current-room*) conj item)
+           (alter (:items @*current-room*) conj (keyword item))
            (.set *courier-available* -1)
-           (print "Item has been delivered to this room" eol)
+           (print "Item has been delivered to this room. Now you can grab it" eol)
          )
          (print "This item doesn't exists" eol))
     )
