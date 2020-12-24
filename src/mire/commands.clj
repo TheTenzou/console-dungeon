@@ -42,17 +42,14 @@
 (defn fire
   "If you have branches, you can light up a fire."
   []
-   (if  (= (player/carrying? item) :branches)
+   (if  (= (player/carrying? :branches) :branches)
       (do
         (player/add-points 1000)
         (dosync
         (commute player/health assoc player/*name* (+ (@player/health player/*name*) 20))
-        (alter *inventory* conj :branches))
-        (str "Lightning up a fire heals you for 20 hp.")
-      )
-      (str "You can't do it. You haven't branches.")
-   )
-)
+        (alter player/*inventory* conj :branches))
+        (str "Lightning up a fire heals you for 20 hp."))
+      (str "You can't do it. You haven't branches.")))
 
 (defn check-set
   "check status of the item set!"
@@ -97,9 +94,6 @@
 
    )
   ))
-
-
-
 
 
 (defn grab
@@ -216,8 +210,6 @@
       (str "What a relief!"))
     (str "You need a firstAidKit for that." player/eol))))
 
-
-(defn fire)
 
 (defn detect
   "If you have the detector, you can see which room an item is in."
