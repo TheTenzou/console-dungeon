@@ -1,6 +1,6 @@
 (ns mire.map_generation)
 
-(def game_items (ref #{:wood-sword :wood-armor :ruby :emerald :diamond :banana :apple :kiwi}))
+(def game_items (ref #{:wood-sword :wood-armor :ruby :emerald :diamond :banana :apple :kiwi :branches}))
 
 (def rooms_graf_head (ref {}))
 
@@ -10,12 +10,12 @@
   "Создание комнаты на lvl-ном уровне графа"
   (try
   (dosync
-    (loop 
+    (loop
       [lv 1
       cr cur_room
       pr nil]
-      (do 
-        (commute cr assoc :room_name (apply str ["room " lv]) :exits (ref {})) 
+      (do
+        (commute cr assoc :room_name (apply str ["room " lv]) :exits (ref {}))
         (commute (:exits @cr) assoc :next (ref {}) :prev pr)
         (println lv)
           (if (< lv lvl)
@@ -29,7 +29,7 @@
     )
   )
     (catch Exception e
-    (.printStackTrace e (new java.io.PrintWriter *err*))) 
+    (.printStackTrace e (new java.io.PrintWriter *err*)))
   )
 )
 
@@ -37,7 +37,7 @@
   "Возвращает сет из n случайных элементов переданного сета (n <= len(set))"
   (loop [iter n
         rand_n_set #{}
-        old_set set] 
+        old_set set]
     (let [rand_value (rand-int (count old_set))]
       (if (> iter 0)
         (recur
@@ -62,17 +62,17 @@
 
 (defn opposite_way [way]
   "Возвращает ключ противоположной стороны света"
-  (keyword (way {:north "south" :east "west" :south "north" :west "east"}))  
+  (keyword (way {:north "south" :east "west" :south "north" :west "east"}))
 )
 
 
 (defn gen_secret [room sec_count]
   "Создаёт запертую комнату и меняет ключи"
   (dosync
-    (if (>= (rand-int 101) 50) 
+    (if (>= (rand-int 101) 50)
       (do
         (commute room assoc :access "locked")
-        (def secrets (+ sec_count 1))  
+        (def secrets (+ sec_count 1))
       )
     )
   )
@@ -83,11 +83,11 @@
 )
 
 (defn gen_graph [current_room direction_from_arrived prev_room lvl]
-  "Принимает ссылку на мапу; 
+  "Принимает ссылку на мапу;
    сторону света, откуда пришли в комнату;
    ссылку на мапу, откуда пришли в комнату;
    уровень графа.
-   Создаёт граф комнат. 
+   Создаёт граф комнат.
    Переданная вначале ссылка будет указателем на структуру"
   (dosync
     (commute current_room assoc :exits (ref {}))
@@ -95,8 +95,8 @@
     (commute current_room assoc :access "open")
     (commute current_room assoc :items (ref #{}))
     (commute current_room assoc :inhabitants (ref #{}))
-    (doseq [item (gen_items (+ (rand-int 3) 1))] 
-      (alter (:items @current_room) conj item)  
+    (doseq [item (gen_items (+ (rand-int 3) 1))]
+      (alter (:items @current_room) conj item)
     )
     (commute current_room assoc :name (str "room " lvl "-" (rand-int 1000)))
     (if (not (nil? direction_from_arrived))
@@ -106,14 +106,14 @@
       (do
         (doseq [direction (gen_sides direction_from_arrived)]
           (commute (:exits @current_room) assoc direction (ref {}))
-          (gen_graph 
+          (gen_graph
             (direction @(:exits @current_room))
             direction
             @current_room
             (- lvl 1)
           )
         )
-      ) 
+      )
       (gen_secret current_room secrets)
     )
   )

@@ -39,54 +39,69 @@
          (look))
        (str "You can't go that way." player/eol)))))
 
+(defn fire
+  "If you have branches, you can light up a fire."
+  []
+   (if  (= (player/carrying? item) :branches)
+      (do
+        (player/add-points 1000)
+        (dosync
+        (commute player/health assoc player/*name* (+ (@player/health player/*name*) 20))
+        (alter *inventory* conj :branches))
+        (str "Lightning up a fire heals you for 20 hp.")
+      )
+      (str "You can't do it. You haven't branches.")
+   )
+)
+
 (defn check-set
   "check status of the item set!"
   [item]
-  (dosync   
-	
+  (dosync
+
    (cond
    (or (= (player/carrying? item) :wood-sword) (= (player/carrying? item) :wood-armor))
          (do (if (and (@player/*inventory* :wood-sword ) (@player/*inventory* :wood-armor ) )
 		      (if (not (@player/*sets* :wood ))
-					(do 
+					(do
 						(alter player/*sets* conj :wood)
 						(player/add-points 200)
 						(str "That's full wood set! +200 points" player/eol )
 					)
 					(str "That's full wood set!"))
               (str "One more thing to go in wood set!" player/eol )))
-	
+
 	(or (= (player/carrying? item) :banana) (= (player/carrying? item) :kiwi) (= (player/carrying? item) :apple))
 			(do (if (and (@player/*inventory* :banana) (@player/*inventory* :kiwi ) (@player/*inventory* :apple))
 				(if (not (@player/*sets* :fruit ))
-					(do 
+					(do
 						(alter player/*sets* conj :fruit)
 						(commute player/health assoc player/*name* (+ (@player/health player/*name*) 15))
 						(str "That's full fruit set! +15 health points" player/eol )
 					)
 					(str "That's full fruit set!"))
-				
+
               (str "There are 3 items in fruit set! Find them all!" player/eol )))
     (or (= (player/carrying? item) :ruby) (= (player/carrying? item) :emerald) (= (player/carrying? item) :diamond))
 			(do (if (and (@player/*inventory* :ruby) (@player/*inventory* :emerald ) (@player/*inventory* :diamond))
 				(if (not (@player/*sets* :philosophers-stone ))
-					(do 
+					(do
 						(alter player/*sets* conj :philosophers-stone)
 						(player/add-points 50000)
 						(str "That's full philosophers' stone! +50000 points!!!! YOU WIN!!!!" player/eol )
 					)
 					(str "That's full philosophers' stone!"))
-				
+
               (str "Find 3 stones... and you'll become more powerfull!" player/eol )))
 	:else (str "sorry... there is no set for this item :(" player/eol )
-	
+
    )
-  ))	   
-	   
-	   
-	   
-	   
-	   
+  ))
+
+
+
+
+
 (defn grab
   "Pick something up."
   [thing]
@@ -136,16 +151,18 @@
           (player/add-points 15000)
           (alter (:items @player/*current-room*) disj :emerald)
           (str "It's so green, wow." player/eol))
+
         "diamond" (do
           (player/add-points 20000)
           (alter (:items @player/*current-room*) disj :diamond)
           (str "Jackpot, yeah!" player/eol))
+
         "death" (commute player/health assoc player/*name* (- (@player/health player/*name*) 80))
         (do
           (move-between-refs (keyword thing)
                             (:items @player/*current-room*)
                             player/*inventory*)
-		  (print (check-set thing))					
+		  (print (check-set thing))
           (str "You picked up the " thing "." player/eol)))
      (str "There isn't any " thing " here." player/eol))))
 
@@ -199,6 +216,8 @@
       (str "What a relief!"))
     (str "You need a firstAidKit for that." player/eol))))
 
+
+(defn fire)
 
 (defn detect
   "If you have the detector, you can see which room an item is in."
@@ -264,7 +283,7 @@
 (defn status
   "Player status"
   []
-  (str 
+  (str
     "You health: " (@player/health player/*name*) "." player/eol
     "You score: " (@player/scores player/*name*) "." player/eol))
 
@@ -287,6 +306,7 @@
                "hesoyam" get-points
                "attack" attack
                "status" status
+               "fire" fire
 			         "check-set" check-set
                "activate-courier" player/activate-courier
                "get-existing-items" player/get-existing-items})
@@ -302,4 +322,3 @@
     (catch Exception e
       (.printStackTrace e (new java.io.PrintWriter *err*))
       "You can't do that!")))
-
