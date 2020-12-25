@@ -85,7 +85,7 @@
   "Check if player's health is over max-health"
   (dosync
     (if (> (@health *name*) max-health)
-      (set-health-value *name* 100))))
+      (set-health-value *name* max-health))))
 
 (defn kill-player-for [target time room]
   "Remove player from room for 'time' seconds

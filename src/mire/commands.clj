@@ -115,14 +115,17 @@
         "banana" (do
           (commute player/health assoc player/*name* (+ (@player/health player/*name*) 10))
           (alter (:items @player/*current-room*) disj :banana)
+          (player/overhealed)
           (str "Banana was so good..." player/eol))
         "apple" (do
           (commute player/health assoc player/*name* (+ (@player/health player/*name*) 8))
           (alter (:items @player/*current-room*) disj :apple)
+          (player/overhealed)
           (str "Mmm... tasty..." player/eol))
         "kiwi" (do
           (commute player/health assoc player/*name* (+ (@player/health player/*name*) 5))
           (alter (:items @player/*current-room*) disj :kiwi)
+          (player/overhealed)
           (str "Urgh! Sour, but OK..." player/eol))
         "sword" (do
           (commute player/attack-values assoc player/*name* (+ (@player/attack-values player/*name*) 20))
