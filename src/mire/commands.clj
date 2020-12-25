@@ -32,9 +32,15 @@
    (let [target ((keyword direction) @(:exits @player/*current-room*))]
      (if target
        (do
-         (move-between-refs player/*name*
+         (if (= (.get player/*is-visible*) 0)
+            (do 
+              (alter (:inhabitants @player/*current-room*) conj player/*name*)
+              (.set player/*is-visible* 1)
+              (println "You are visible now")
+            )
+            (move-between-refs player/*name*
                             (:inhabitants @player/*current-room*)
-                            (:inhabitants @target))
+                            (:inhabitants @target)))
          (ref-set player/*current-room* @target)
          (look))
        (str "You can't go that way." player/eol)))))
@@ -301,6 +307,7 @@
                "fire" fire
 			         "check-set" check-set
                "activate-courier" player/activate-courier
+               "activate-invisibility" player/activate-invisibility
                "get-existing-items" player/get-existing-items})
 
 ;; Command handling

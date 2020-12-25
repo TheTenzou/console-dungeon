@@ -39,6 +39,8 @@
         (commute player/streams assoc player/*name* *out*)
         (.set player/*keys-count* 0)
         (.set player/*courier-available* 0)
+        (.set player/*invis-available* 0)
+        (.set player/*is-visible* 1)
         (commute player/existing-items conj
           :banana :apple :kiwi :sword :bow
           :axe :gold :ruby :emerald :diamond)
@@ -73,4 +75,4 @@
      (defonce server (socket/create-server (Integer. port) mire-handle-client))
      (println "Launching Console Dungeon server on port" port))
   ([port] (-main port "resources/rooms"))
-  ([] (-main 3333)))
+  ([] (-main 3332)))
