@@ -11,8 +11,14 @@
            {:name (keyword (.getName file))
             :desc (:desc room)
             :exits (ref (:exits room))
-            :items (ref (or (:items room) #{}))
-            :inhabitants (ref #{})}})))
+            :items (map_gen/gen_items (rand-int 3)) ;:items (ref (or (:items room) #{}))
+            :inhabitants (ref #{})
+            :access (map_gen/gen_secret)
+           }
+          }
+    )
+  )
+)
 
 (defn load-rooms
   "Given a dir, return a map with an entry corresponding to each file
@@ -25,8 +31,10 @@
 (defn add-rooms
   "Look through all the files in a dir for files describing rooms and add
   them to the mire.rooms/rooms map."
-  []
-  (def rooms (ref (map_gen/gen_rooms 6)))  
+  [dir]
+  ;(def rooms (ref (map_gen/gen_rooms 3))) 
+  (dosync
+   (alter rooms load-rooms dir)) 
 )
 
 (defn room-contains?

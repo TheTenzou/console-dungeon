@@ -36,13 +36,13 @@
 (defn get_n_rand_from_set [n set]
   "Возвращает сет из n случайных элементов переданного сета (n <= len(set))"
   (loop [iter n
-        rand_n_set #{}
-        old_set set]
+        rand_n_set (ref #{})
+        old_set set] 
     (let [rand_value (rand-int (count old_set))]
       (if (> iter 0)
         (recur
           (- iter 1)
-          (conj rand_n_set (nth (vec old_set) rand_value))
+          (ref (conj @rand_n_set (nth (vec old_set) rand_value)))
           (disj old_set (nth (vec old_set) rand_value))
         )
         rand_n_set
@@ -66,31 +66,28 @@
 )
 
 
-(defn gen_secret [room sec_count]
+(defn gen_secret []
   "Создаёт запертую комнату и меняет ключи"
-  (dosync
-    (if (>= (rand-int 101) 50)
-      (do
-        (commute room assoc :access "locked")
-        (def secrets (+ sec_count 1))
-      )
+    (if (>= (rand-int 101) 30) 
+      (str "open")
+      (str "locked")
     )
-  )
 )
 
 (defn gen_items [items_count]
   (get_n_rand_from_set items_count @game_items)
 )
-
-(defn gen_graph [current_room direction_from_arrived prev_room lvl]
-  "Принимает ссылку на мапу;
+;; в создание комнаты внедрить генерацию предметов
+; посмотреть, где лежат эти предметы
+; заполнить файлы
+(defn gen_graph [current_room direction_from_arrived lvl]
+  "Принимает ссылку на мапу; 
    сторону света, откуда пришли в комнату;
    ссылку на мапу, откуда пришли в комнату;
    уровень графа.
    Создаёт граф комнат.
    Переданная вначале ссылка будет указателем на структуру"
   (dosync
-    (commute current_room assoc :exits (ref {}))
     (commute current_room assoc :desc "")
     (commute current_room assoc :access "open")
     (commute current_room assoc :items (ref #{}))
@@ -99,29 +96,28 @@
       (alter (:items @current_room) conj item)
     )
     (commute current_room assoc :name (str "room " lvl "-" (rand-int 1000)))
-    (if (not (nil? direction_from_arrived))
-      (commute (:exits @current_room) assoc (opposite_way direction_from_arrived) (ref prev_room))
-    )
-    (if (> (- lvl 1) 0)
-      (do
-        (doseq [direction (gen_sides direction_from_arrived)]
-          (commute (:exits @current_room) assoc direction (ref {}))
-          (gen_graph
-            (direction @(:exits @current_room))
-            direction
-            @current_room
-            (- lvl 1)
+    (let [sides_arr (gen_sides direction_from_arrived)]
+      (if  (nil? direction_from_arrived) (commute current_room assoc :exits (ref {}) ) )
+      (if (> (- lvl 1) 0)
+        (do
+          (doseq [direction sides_arr]
+            (commute (:exits @current_room) assoc direction (ref {}))
+            (commute (direction @(:exits @current_room)) assoc :exits (ref {}))
+            (commute (:exits @(direction @(:exits @current_room))) assoc (opposite_way direction) (ref @current_room))
+          )
+          (doseq [direction sides_arr]
+            (gen_graph (direction @(:exits @current_room)) direction (- lvl 1))
           )
         )
+        (gen_secret current_room secrets)
       )
-      (gen_secret current_room secrets)
     )
   )
 )
 
 (defn gen_rooms [levels_count]
   (let [rooms (ref {})]
-    (gen_graph rooms nil nil levels_count)
+    (gen_graph rooms nil levels_count)
     rooms
   )
 )

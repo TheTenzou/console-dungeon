@@ -31,7 +31,7 @@
     ;; the one above so *in* and *out* will be bound to the socket
     (print player/eol "What is your name? ") (flush)
     (binding [player/*name* (get-unique-player-name (read-line))
-              player/*current-room* @rooms/rooms
+              player/*current-room* (ref (@rooms/rooms :start))
               player/*inventory* (ref #{})
               player/*sets* (ref #{})]
       (dosync
@@ -71,7 +71,7 @@
 
 (defn -main
   (  [port dir]
-     (rooms/add-rooms)
+     (rooms/add-rooms dir)
      (defonce server (socket/create-server (Integer. port) mire-handle-client))
      (println "Launching Console Dungeon server on port" port))
   ([port] (-main port "resources/rooms"))

@@ -29,7 +29,8 @@
   "\"♬ We gotta get out of this place... ♪\" Give a direction."
   [direction]
   (dosync
-   (let [target ((keyword direction) @(:exits @player/*current-room*))]
+   (let [target-name ((:exits @player/*current-room*) (keyword direction))
+         target (@rooms/rooms target-name)]
      (if target
        (do
          (if (= (.get player/*is-visible*) 0)
@@ -40,10 +41,10 @@
             )
             (move-between-refs player/*name*
                             (:inhabitants @player/*current-room*)
-                            (:inhabitants @target)))
-         (ref-set player/*current-room* @target)
-         (look))
-       (str "You can't go that way." player/eol)))))
+                            (:inhabitants target)))
+         (ref-set player/*current-room* target)
+         (look)
+       (str "You can't go that way." player/eol))))))
 
 (defn fire
   "If you have branches, you can light up a fire."
@@ -145,6 +146,8 @@
         "diamond" (do
           (player/add-points 20000)
           (println "Jackpot, yeah!"))
+        (do
+          (move-between-refs (keyword thing) (:items @player/*current-room*) player/*inventory*))
       )
     )
   )
