@@ -43,8 +43,8 @@
                             (:inhabitants @player/*current-room*)
                             (:inhabitants target)))
          (ref-set player/*current-room* target)
-         (look)
-       (str "You can't go that way." player/eol))))))
+         (look))
+       (str "You can't go that way." player/eol)))))
 
 (defn fire
   "If you have branches, you can light up a fire."
