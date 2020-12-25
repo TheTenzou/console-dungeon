@@ -47,7 +47,7 @@
         (player/add-points 1000)
         (dosync
         (commute player/health assoc player/*name* (+ (@player/health player/*name*) 20))
-        (alter player/*inventory* conj :branches))
+        (alter player/*inventory* disj :branches))
         (str "Lightning up a fire heals you for 20 hp."))
       (str "You can't do it. You haven't branches.")))
 
@@ -295,13 +295,11 @@
                "say" say
                "help" help
                "score" score
-               "hesoyam" get-points
                "attack" attack
                "status" status
                "fire" fire
 			         "check-set" check-set
-               "activate-courier" player/activate-courier
-               "get-existing-items" player/get-existing-items})
+               "activate-courier" player/activate-courier})
 
 ;; Command handling
 
