@@ -29,20 +29,21 @@
   "\"♬ We gotta get out of this place... ♪\" Give a direction."
   [direction]
   (dosync
-   (let [target ((keyword direction) @(:exits @player/*current-room*))]
+   (let [target-name ((:exits @player/*current-room*) (keyword direction))
+         target (@rooms/rooms target-name)]
      (if target
        (do
          (move-between-refs player/*name*
                             (:inhabitants @player/*current-room*)
-                            (:inhabitants @target))
-         (ref-set player/*current-room* @target)
+                            (:inhabitants target))
+         (ref-set player/*current-room* target)
          (look))
        (str "You can't go that way." player/eol)))))
 
 (defn grab
   "Pick something up."
   [thing]
-  (dosync
+  (dosync 
     (if (rooms/room-contains? @player/*current-room* thing)
       (if (= (compare thing "keys") 0)
         (do 
@@ -53,6 +54,7 @@
           (move-between-refs (keyword thing)
                             (:items @player/*current-room*)
                             player/*inventory*)
+                            (println "and here")
           (str "You picked up the " thing "." player/eol)))
      (str "There isn't any " thing " here." player/eol))))
 
