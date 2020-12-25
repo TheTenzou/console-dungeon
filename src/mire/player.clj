@@ -19,7 +19,10 @@
 (def scores (ref {}))
 ; возможность вызвать курьера
 (def ^:dynamic *courier-available* (ThreadLocal.))
-
+; возможность стать невидимым
+(def ^:dynamic *invis-available* (ThreadLocal.))
+; видимость игрока
+(def ^:dynamic *is-visible* (ThreadLocal.))
 ; учёт собранных сетов
 (def ^:dynamic *sets*)
 
@@ -59,6 +62,13 @@
       (do 
         (.set *courier-available* 1))
         (println "You can use courier"))
+    (if 
+      (and 
+        (not= (.get *invis-available*) -1)
+        (>= (@scores *name*) (/ target-score 2)))
+      (do 
+        (.set *invis-available* 1))
+        (println "You can use invisibility"))
     (swap! finished game-is-finished?)))
 
 (defn set-health-value [target value]
@@ -168,3 +178,17 @@
   )
 )
 
+(defn activate-invisibility []
+  (dosync
+    (case (.get *invis-available*)
+    -1 (print "You have already used invisibility!" eol)
+     0 (print "You can't use invisibility cause you don't have enough points" eol)
+     1 (do
+         (alter (:inhabitants @*current-room*) disj *name*)
+         (.set *is-visible* 0)
+         (.set *invis-available* -1)
+         (print "Now you will be invisible until you are in this room" eol)
+       )
+    )
+  )
+)
