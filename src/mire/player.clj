@@ -1,5 +1,6 @@
   (ns mire.player)
 
+
 (def existing-items (ref #{}))
 
 ;Player staff
@@ -70,6 +71,7 @@
         (.set *invis-available* 1))
         (println "You can use invisibility"))
     (swap! finished game-is-finished?)))
+
 
 (defn set-health-value [target value]
   "Set players health value.
@@ -164,14 +166,14 @@
   
 (defn activate-courier [item]
   (dosync
-    (case (.get *courier-available*)
-    -1 (print "You have already used a courier!" eol)
+    (case (.get *courier-available*) 
+     -1 (print "You have already used a courier!" eol)
      0 (print "You can't use courier cause you don't have enough points" eol)
      1 (if (@existing-items (keyword item))
          (do
-           (alter *inventory* conj item)
+           (alter (:items @*current-room*) conj (keyword item))
            (.set *courier-available* -1)
-           (print "Item has been added to your inventory" eol)
+           (print "Item has been delivered to this room. Now you can grab it" eol)
          )
          (print "This item doesn't exists" eol))
     )
