@@ -14,7 +14,7 @@
 (defn look
   "Get a description of the surrounding environs and its contents."
   []
-  (str "You're in the " (:name @player/*current-room*) (:desc @player/*current-room*)
+  (str "You're in the " (:name @player/*current-room*) player/eol (:desc @player/*current-room*)
        player/eol "Exits: " (keys @(:exits @player/*current-room*)) player/eol
        (str/join player/eol (map #(str "There is " % " here." player/eol)
                            @(:items @player/*current-room*)))
@@ -54,6 +54,7 @@
         (player/add-points 1000)
         (dosync
         (commute player/health assoc player/*name* (+ (@player/health player/*name*) 20))
+        (player/overhealed)
         (alter player/*inventory* disj :branches))
         (str "Lightning up a fire heals you for 20 hp."))
       (str "You can't do it. You haven't branches.")))

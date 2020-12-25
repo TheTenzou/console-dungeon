@@ -42,8 +42,10 @@
         (.set player/*invis-available* 0)
         (.set player/*is-visible* 1)
         (commute player/existing-items conj
-          :banana :apple :kiwi :sword :bow
-          :axe :gold :ruby :emerald :diamond)
+          :wood-sword :wood-armor :ruby 
+          :emerald :diamond :banana :apple :kiwi :branches
+          :keys :sword :bow :axe :gold :firstAidKit
+        )
         (commute player/scores assoc player/*name* 0)
         (commute player/health assoc player/*name* player/max-health)
         (commute player/attack-values assoc player/*name* player/base-attack-value))
