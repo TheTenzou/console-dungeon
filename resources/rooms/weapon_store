@@ -1,0 +1,3 @@
+{:desc "You found the weapon store."
+ :exits {:south :cafe}
+}

@@ -1,0 +1,3 @@
+{:desc "You go upstairs and see wonderful cafe."
+ :exits {:north :aquarium}
+}
