@@ -1,6 +1,6 @@
 (ns mire.map_generation)
 
-(def game_items (ref #{:mat :sin :doch}))
+(def game_items (ref #{:wood-sword :wood-armor :ruby :emerald :diamond :banana :apple :kiwi :branches}))
 
 (def rooms_graf_head (ref {}))
 
@@ -10,12 +10,12 @@
   "Создание комнаты на lvl-ном уровне графа"
   (try
   (dosync
-    (loop 
+    (loop
       [lv 1
       cr cur_room
       pr nil]
-      (do 
-        (commute cr assoc :room_name (apply str ["room " lv]) :exits (ref {})) 
+      (do
+        (commute cr assoc :room_name (apply str ["room " lv]) :exits (ref {}))
         (commute (:exits @cr) assoc :next (ref {}) :prev pr)
         (println lv)
           (if (< lv lvl)
@@ -29,7 +29,7 @@
     )
   )
     (catch Exception e
-    (.printStackTrace e (new java.io.PrintWriter *err*))) 
+    (.printStackTrace e (new java.io.PrintWriter *err*)))
   )
 )
 
@@ -62,7 +62,7 @@
 
 (defn opposite_way [way]
   "Возвращает ключ противоположной стороны света"
-  (keyword (way {:north "south" :east "west" :south "north" :west "east"}))  
+  (keyword (way {:north "south" :east "west" :south "north" :west "east"}))
 )
 
 
@@ -85,15 +85,15 @@
    сторону света, откуда пришли в комнату;
    ссылку на мапу, откуда пришли в комнату;
    уровень графа.
-   Создаёт граф комнат. 
+   Создаёт граф комнат.
    Переданная вначале ссылка будет указателем на структуру"
   (dosync
     (commute current_room assoc :desc "")
     (commute current_room assoc :access "open")
     (commute current_room assoc :items (ref #{}))
     (commute current_room assoc :inhabitants (ref #{}))
-    (doseq [item (gen_items (+ (rand-int 3) 1))] 
-      (alter (:items @current_room) conj item)  
+    (doseq [item (gen_items (+ (rand-int 3) 1))]
+      (alter (:items @current_room) conj item)
     )
     (commute current_room assoc :name (str "room " lvl "-" (rand-int 1000)))
     (let [sides_arr (gen_sides direction_from_arrived)]

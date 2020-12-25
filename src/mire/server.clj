@@ -33,10 +33,15 @@
     (binding [player/*name* (get-unique-player-name (read-line))
               player/*current-room* (ref (@rooms/rooms :start))
               player/*inventory* (ref #{})]
+              player/*sets* (ref #{})]
       (dosync
         (commute (:inhabitants @player/*current-room*) conj player/*name*)
         (commute player/streams assoc player/*name* *out*)
         (.set player/*keys-count* 0)
+        (.set player/*courier-available* 0)
+        (commute player/existing-items conj
+          :banana :apple :kiwi :sword :bow
+          :axe :gold :ruby :emerald :diamond)
         (commute player/scores assoc player/*name* 0)
         (commute player/health assoc player/*name* player/max-health)
         (commute player/attack-values assoc player/*name* player/base-attack-value))
