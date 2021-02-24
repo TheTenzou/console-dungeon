@@ -3,6 +3,39 @@
 (def game_items (ref #{:wood-sword :wood-armor :ruby :emerald :diamond :banana :apple :kiwi :branches
 :keys :sword :bow :axe :gold :firstAidKit}))
 
+(def anecdots [
+  "Pregnant horses run faster because they have more horsepower."
+
+  "- You have cancer, you have six months to live.
+  - Oh my god, doctor!
+  - Yes, I'm joking, since April 1, what six months, at most a month.
+
+  The meaning of life is to find yourself before alcohol addiction finds you."
+
+  "Osteochondrosis - look at the world from a different angle!"
+
+  "A normal person only needs another 5 minutes to get enough sleep."
+
+  "- Mom, look at the dove! do you have bread?
+  - eat without bread!"
+
+  "- Do you want coffee in bed?
+  - Not! Better in a cup!"
+
+  "Childhood is when the cat is older than you."
+
+  "The standard of hectare was stolen from the French Chamber of Weights and Measures."
+
+  "Every now and then I see the news that the next battle of the century will take place. Boxers generally know how long a century lasts?
+  Crab stick syndrome - you know you are being cheated, but that suits you."
+
+  "Hello, I'm Ivan, 42, and I'm a food alcoholic. I eat up all my salary."
+
+  "Please enter my savings into the Red Book. They are on the verge of extinction!"
+
+  "I decided to switch to a healthy lifestyle. Сleaned a tangerine for breakfast, it suddenly splashed in the eye... Sausage doesn't do that."
+])
+
 (def rooms_graf_head (ref {}))
 
 (def secrets 0)
@@ -38,7 +71,7 @@
   "Возвращает сет из n случайных элементов переданного сета (n <= len(set))"
   (loop [iter n
         rand_n_set (ref #{})
-        old_set set] 
+        old_set set]
     (let [rand_value (rand-int (count old_set))]
       (if (> iter 0)
         (recur
@@ -69,7 +102,7 @@
 
 (defn gen_secret []
   "Создаёт запертую комнату и меняет ключи"
-    (if (>= (rand-int 101) 30) 
+    (if (>= (rand-int 101) 30)
       (str "open")
       (str "locked")
     )
@@ -82,7 +115,7 @@
 ; посмотреть, где лежат эти предметы
 ; заполнить файлы
 (defn gen_graph [current_room direction_from_arrived lvl]
-  "Принимает ссылку на мапу; 
+  "Принимает ссылку на мапу;
    сторону света, откуда пришли в комнату;
    ссылку на мапу, откуда пришли в комнату;
    уровень графа.

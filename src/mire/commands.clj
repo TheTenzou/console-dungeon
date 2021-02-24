@@ -1,7 +1,8 @@
 (ns mire.commands
   (:require [clojure.string :as str]
             [mire.rooms :as rooms]
-            [mire.player :as player]))
+            [mire.player :as player]
+            [mire.map_generation :as map_generation]))
 
 (defn- move-between-refs
   "Move one instance of obj between from and to. Must call in a transaction."
@@ -10,6 +11,21 @@
   (alter to conj obj))
 
 ;; Command functions
+
+(defn pick-rand
+"Return a random element of vect."
+[vect]
+(vect (rand-int (count vect))))
+
+
+(defn anec-counter []
+  "Special function that increase the counter when player enters the new room.
+  If counter reaches 5 random anecdot displays."
+  (if (= (.get player/*anecs*) 5)
+    (.set player/*anecs* 0)
+    (.set player/*anecs* (+ (.get player/*anecs*) 1))
+  )
+)
 
 (defn look
   "Get a description of the surrounding environs and its contents."
@@ -22,6 +38,9 @@
           (str "You are alone in the room." player/eol)
           (str "Players: " (str/join ", " (disj @(:inhabitants @player/*current-room*) player/*name*)) "." player/eol)
        )
+       (if (= (.get player/*anecs*) 5)
+          (str/join (pick-rand map_generation/anecdots) player/eol)
+       )
   )
 )
 
@@ -33,8 +52,9 @@
          target (@rooms/rooms target-name)]
      (if target
        (do
+         (anec-counter)
          (if (= (.get player/*is-visible*) 0)
-            (do 
+            (do
               (alter (:inhabitants @player/*current-room*) conj player/*name*)
               (.set player/*is-visible* 1)
               (println "You are visible now")
@@ -172,7 +192,7 @@
       (str "There isn't any " thing " here." player/eol)
     )
   )
-)  
+)
 
 (defn discard
   "Put down that you're carrying."

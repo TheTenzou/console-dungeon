@@ -26,6 +26,8 @@
 (def ^:dynamic *is-visible* (ThreadLocal.))
 ; учёт собранных сетов
 (def ^:dynamic *sets*)
+; счётчик анекдотов
+(def ^:dynamic *anecs* (ThreadLocal.))
 
 ; константы игрока
 ; константа с максимальным хп
@@ -56,18 +58,18 @@
   "Add points to current player"
   (dosync
     (commute scores assoc *name* (+ (@scores *name*) points))
-    (if 
-      (and 
+    (if
+      (and
         (not= (.get *courier-available*) -1)
         (>= (@scores *name*) (/ target-score 2)))
-      (do 
+      (do
         (.set *courier-available* 1))
         (println "You can use courier"))
-    (if 
-      (and 
+    (if
+      (and
         (not= (.get *invis-available*) -1)
         (>= (@scores *name*) (/ target-score 2)))
-      (do 
+      (do
         (.set *invis-available* 1))
         (println "You can use invisibility"))
     (swap! finished game-is-finished?)))
@@ -109,7 +111,7 @@
 ; Высчитывание количества граней кубика в зависимости от количества hp
 (defn calc-sides
 	[hp]
-	(cond 
+	(cond
 	(< hp 20) 4
 	(< hp 50) 5
 	:else 6
@@ -125,12 +127,12 @@
 (defn crit-damage
 	[base-damage sides]
 	(let [rd (roll-dice sides)]
-	(cond 
+	(cond
 		(= rd sides) (int (* base-damage 1.5))
 		(> rd (/ sides 2)) base-damage
 		(<= rd (/ sides 2)) (int (/ base-damage 1.5))
 		)
-	
+
 	)
 )
 ;;======
@@ -160,13 +162,13 @@
   "Get health value of current player"
   (@health *name*))
 
-  
+
 (defn get-existing-items []
   (print @existing-items))
   
 (defn activate-courier [item]
   (dosync
-    (case (.get *courier-available*) 
+    (case (.get *courier-available*)
      -1 (print "You have already used a courier!" eol)
      0 (print "You can't use courier cause you don't have enough points" eol)
      1 (if (@existing-items (keyword item))

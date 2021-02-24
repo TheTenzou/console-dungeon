@@ -5,7 +5,7 @@
             [mire.commands :as commands]
             [mire.rooms :as rooms]
   ))
-          
+
 (defn- cleanup []
   "Drop all inventory and remove player from room and player list."
   (dosync
@@ -41,8 +41,10 @@
         (.set player/*courier-available* 0)
         (.set player/*invis-available* 0)
         (.set player/*is-visible* 1)
+        (.set player/*anecs* 0)
+
         (commute player/existing-items conj
-          :wood-sword :wood-armor :ruby 
+          :wood-sword :wood-armor :ruby
           :emerald :diamond :banana :apple :kiwi :branches
           :keys :sword :bow :axe :gold :firstAidKit
         )
@@ -52,12 +54,12 @@
 
       (println (commands/look)) (print player/prompt) (flush)
 
-      (try 
+      (try
         (loop [input (read-line)]
           (when input
 
             (if (> (player/get-health) 0)
-              (do 
+              (do
                 (println (commands/execute input))
                 (.flush *err*))
               (println "You are dead!"))
@@ -77,4 +79,4 @@
      (defonce server (socket/create-server (Integer. port) mire-handle-client))
      (println "Launching Console Dungeon server on port" port))
   ([port] (-main port "resources/rooms"))
-  ([] (-main 3332)))
+  ([] (-main 3333)))
