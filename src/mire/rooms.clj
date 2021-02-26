@@ -6,12 +6,18 @@
 
 (defn load-room [rooms file]
   (let [room (read-string (slurp (.getAbsolutePath file)))]
+    (def items (map_gen/gen_items (rand-int 3)))
+    (if (or (contains? (set @items) :gold) (contains? (set @items) :diamond) (contains? (set @items) :ruby) (contains? (set @items) :emerald))
+        (def monster (map_gen/get_high_level_monster))
+        (def monster (map_gen/get_low_level_monster))
+    )
     (conj rooms
           {(keyword (.getName file))
            {:name (keyword (.getName file))
             :desc (:desc room)
             :exits (ref (:exits room))
-            :items (map_gen/gen_items (rand-int 3)) ;:items (ref (or (:items room) #{}))
+            :items items ;:items (ref (or (:items room) #{}))
+            :monsters monster
             :inhabitants (ref #{})
             :access (map_gen/gen_secret)
            }

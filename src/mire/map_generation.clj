@@ -3,6 +3,20 @@
 (def game_items (ref #{:wood-sword :wood-armor :ruby :emerald :diamond :banana :apple :kiwi :branches
 :keys :sword :bow :axe :gold :firstAidKit}))
 
+(def low_level_monsters [
+    ["Ogre" 4]
+    ["Troll" 5]
+    ["Mad dog" 2]
+    ["Ghost" 3]
+    ["Brownie" 1]
+])
+
+(def high_level_monsters [
+    ["Dragon" 40]
+    ["Zombie" 25]
+    ["Vampire" 30]
+])
+
 (def anecdots [
   "Pregnant horses run faster because they have more horsepower."
 
@@ -85,6 +99,22 @@
   )
 )
 
+(defn get_low_level_monster []
+    "Генерация случайного монстра низкого уровня, возвращается вектор [Имя Урон]"
+    (def monsters_count (count low_level_monsters))
+    (def random_index (rand-int (+ monsters_count 3)))
+    (if (>= random_index monsters_count)
+        ["No monsters" 0]
+        (get low_level_monsters random_index)
+    )
+)
+
+(defn get_high_level_monster []
+    "Генерация случайного монстра высокого уровня, возвращается вектор [Имя Урон]"
+    (def monsters_count (count high_level_monsters))
+    (get high_level_monsters (rand-int monsters_count))
+)
+
 (defn gen_sides [origin_way]
   "Принимает ключ, возвращает случайный сет размерности от 0 до 3,
    состоящий из случайных ключей сторон света"
@@ -126,6 +156,7 @@
     (commute current_room assoc :access "open")
     (commute current_room assoc :items (ref #{}))
     (commute current_room assoc :inhabitants (ref #{}))
+    (commute current_room assoc :monster [])
     (doseq [item (gen_items (+ (rand-int 3) 1))]
       (alter (:items @current_room) conj item)
     )
