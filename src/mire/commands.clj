@@ -38,7 +38,7 @@
           (str "There are no players in the room." player/eol)
           (str "Players: " (str/join ", " (disj @(:inhabitants @player/*current-room*) player/*name*)) "." player/eol)
        )
-       (if (= (get (:monsters @player/*current-room*) 1) 0)
+        (if (= (get (:monsters @player/*current-room*) 1) 0)
             (str "Lucky you! There are no monsters in the room." player/eol)
             (str "Beware! " (get (:monsters @player/*current-room*) 0) " is guarding the treasure. You will take " (get (:monsters @player/*current-room*) 1) " damage." player/eol)
        )
@@ -299,6 +299,20 @@
   (player/add-points 25000)
   (str "MORE POINTS!!!!!!!" player/eol))
 
+(defn attackmonster
+  "Attackmonster"
+ []
+  (case (player/attack @player/*name*)
+      2 (str "You died by" (get (:monsters @player/*current-room*) 0) "." player/eol)
+      1 (do   
+            (println)
+            (println (str "You was attacked by " (get (:monsters @player/*current-room*) 0) "."))
+            (check_monster_damage)
+            (println (str "You hp is " (@player/health @player/*name*) "."))
+            (println))
+      0 (str (get (:monsters @player/*current-room*) 0) " isn't here." player/eol))
+    )
+
 (defn attack
   "Attack other player"
   [target-number]
@@ -316,7 +330,8 @@
             target " counterattack." player/eol
             "You hp is " (@player/health player/*name*) "." player/eol))
       0 (str target " isn't here." player/eol))
-    (str "There is not " target-number "th player here")))
+    (str "There is not " target-number "th player here"))
+    )
 
 (defn status
   "Player status"
@@ -333,6 +348,7 @@
                "east" (fn [] (move :east)),
                "west" (fn [] (move :west)),
                "grab" grab
+               "monsterattack" attackmonster
                "discard" discard
                "inventory" inventory
                "heal" heal
@@ -353,6 +369,7 @@
 (defn execute
   "Execute a command that is passed to us."
   [input]
+  
   (try
     (let [[command & args] (.split input " +")]
       (apply (commands command) args))
