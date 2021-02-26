@@ -1,6 +1,4 @@
-(ns mire.map_generation
-(:require
-            [mire.player :as player]))
+(ns mire.map_generation)
 
 (def game_items (ref #{:wood-sword :wood-armor :ruby :emerald :diamond :banana :apple :kiwi :branches
 :keys :sword :bow :axe :gold :firstAidKit}))
