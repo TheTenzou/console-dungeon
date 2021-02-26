@@ -35,8 +35,12 @@
        (str/join player/eol (map #(str "There is " % " here." player/eol)
                            @(:items @player/*current-room*)))
        (if (empty? (disj @(:inhabitants @player/*current-room*) player/*name*))
-          (str "You are alone in the room." player/eol)
+          (str "There are no players in the room." player/eol)
           (str "Players: " (str/join ", " (disj @(:inhabitants @player/*current-room*) player/*name*)) "." player/eol)
+       )
+       (if (= (get (:monsters @player/*current-room*) 1) 0)
+            (str "Lucky you! There are no monsters in the room." player/eol)
+            (str "Beware! " (get (:monsters @player/*current-room*) 0) " is guarding the treasure. You will take " (get (:monsters @player/*current-room*) 1) " damage." player/eol)
        )
        (if (= (.get player/*anecs*) 5)
           (str/join (pick-rand map_generation/anecdots) player/eol)
@@ -174,6 +178,18 @@
   )
 )
 
+(defn check_monster_damage []
+    "Снижает уровень здоровья при попытке взять предмет, если в комнате есть монстр"
+    (dosync
+        (if (> (get (:monsters @player/*current-room*) 1) 0)
+            (do
+                (player/set-health-value player/*name* (- (@player/health player/*name*) (get (:monsters @player/*current-room*) 1)))
+                (str (get (:monsters @player/*current-room*) 0) " did " (get (:monsters @player/*current-room*) 1) " damage to you!" player/eol)           
+            )
+        )
+    )
+)
+
 (defn grab
   "Pick something up."
   [thing]
@@ -187,6 +203,7 @@
         (do
           (println "You picked up the" thing ".")
           (analyze thing)
+          (check_monster_damage)
         )
       )
       (str "There isn't any " thing " here." player/eol)
